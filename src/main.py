@@ -1,10 +1,10 @@
+from transformers import BertTokenizer
+import utils
 import os
-import torch
 
-# Defining project root in order to avoid relative paths
-PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+train_file = os.path.join(utils.PROJECT_ROOT, "data", "train.jsonl")
+train_file = os.path.join(utils.PROJECT_ROOT, "data", "test.jsonl")
 
-# Initializing torch device according to hardware available
-DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
+train_data = utils.load_train(train_file)
 
-
+# tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
