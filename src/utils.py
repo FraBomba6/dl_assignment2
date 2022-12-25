@@ -23,19 +23,20 @@ def load_train(path):
         output = [json.loads(line) for line in f.readlines()]
         return pd.DataFrame.from_records(output)
 
-def apply_random_validation_split(train_data, split=20):
-    units = train_data.shape[0] 
+
+def apply_random_validation_split(train_dataset: torch.utils.data.TensorDataset, split=20):
+    units = len(train_dataset)
     validation_size = split * units / 100
     train_size = units - validation_size
     assert(validation_size + train_size == units)
 
-    return torch.utils.data.random_split(train_data, [train_size, validation_size])
+    return torch.utils.data.random_split(train_dataset, [train_size, validation_size])
 
 
-def tokenize(sentence_list, target_list):
+def tokenize(sentence_list, options_list, target_list):
     encode_plus_args = {
         "add_special_tokens": True,
-        "max_length": 45,
+        "max_length": 50,
         "padding": 'max_length',
         "return_attention_mask": True,
         "return_tensors": 'pt',
@@ -44,10 +45,11 @@ def tokenize(sentence_list, target_list):
     input_ids_list = []
     attention_masks_list = []
     return_target_list = []
-    for (sentence, target_label) in tqdm(zip(sentence_list, target_list), total=len(sentence_list)):
-        encoded_dict = TOKENIZER.encode_plus(sentence, **encode_plus_args)
+    for (sentence, options, target_label) in tqdm(zip(sentence_list, options_list, target_list), total=len(sentence_list)):
+        sentences = [sentence.replace("_", option) for option in options]
+        encoded_dict = TOKENIZER(sentences, **encode_plus_args)
         input_ids_list.append(encoded_dict['input_ids'])
         attention_masks_list.append(encoded_dict['attention_mask'])
-        return_target_list.append(int(target_label))
+        return_target_list.append(int(target_label)-1)
 
-    return torch.cat(input_ids_list, dim=0), torch.cat(attention_masks_list, dim=0), torch.as_tensor(return_target_list)
+    return torch.stack(input_ids_list, dim=0), torch.stack(attention_masks_list, dim=0), torch.as_tensor(return_target_list)
