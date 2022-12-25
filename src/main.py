@@ -4,6 +4,10 @@ import os
 from rich.console import Console
 
 console = Console()
+
+# %%
+BATCH_SIZE = 4
+
 # %%
 console.log("Loading data")
 train_file = os.path.join(utils.PROJECT_ROOT, "data", "train.jsonl")
@@ -30,11 +34,13 @@ test_input_ids, test_attention_masks, test_targets = utils.tokenize(
 # %%
 console.log("Creating datasets and dataloaders")
 train_dataset, validation_dataset = utils.apply_random_validation_split(TensorDataset(train_input_ids, train_attention_masks, train_targets))
-train_dataloader = DataLoader(train_dataset, sampler=RandomSampler(train_dataset), batch_size=4)
-validation_dataloader = DataLoader(validation_dataset, sampler=RandomSampler(validation_dataset), batch_size=4)
+train_dataloader = DataLoader(train_dataset, sampler=RandomSampler(train_dataset), batch_size=BATCH_SIZE)
+validation_dataloader = DataLoader(validation_dataset, sampler=RandomSampler(validation_dataset), batch_size=BATCH_SIZE)
 
 test_dataset = TensorDataset(test_input_ids, test_attention_masks, test_targets)
-test_dataloader = DataLoader(test_dataset, sampler=RandomSampler(test_dataset), batch_size=4)
+test_dataloader = DataLoader(test_dataset, sampler=RandomSampler(test_dataset), batch_size=BATCH_SIZE)
 
 # %%
-
+console.log("Clearing variables")
+del(train_input_ids, train_attention_masks, train_targets)
+del(test_input_ids, test_attention_masks, test_targets)
