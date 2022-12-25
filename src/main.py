@@ -1,4 +1,10 @@
-from torch.utils.data import TensorDataset, DataLoader, RandomSampler, SequentialSampler
+import torch
+from torch.utils.data import TensorDataset, DataLoader, RandomSampler
+from transformers import BertForMultipleChoice
+from torch.optim import AdamW
+from transformers import get_linear_schedule_with_warmup
+import numpy as np
+import random
 import utils
 import os
 from rich.console import Console
@@ -7,6 +13,13 @@ console = Console()
 
 # %%
 BATCH_SIZE = 4
+EPOCHS = 5
+
+seed = 3407
+random.seed(seed)
+np.random.seed(seed)
+torch.manual_seed(seed)
+torch.cuda.manual_seed_all(seed)
 
 # %%
 console.log("Loading data")
@@ -44,3 +57,84 @@ test_dataloader = DataLoader(test_dataset, sampler=RandomSampler(test_dataset), 
 console.log("Clearing variables")
 del(train_input_ids, train_attention_masks, train_targets)
 del(test_input_ids, test_attention_masks, test_targets)
+
+# %%
+model = BertForMultipleChoice.from_pretrained('bert-base-uncased')
+model.to(utils.DEVICE)
+
+optimizer = AdamW(model.parameters(), lr=2e-5, eps=1e-8)
+scheduler = get_linear_schedule_with_warmup(
+    optimizer,
+    num_warmup_steps=0,
+    num_training_steps=EPOCHS * len(train_dataloader)
+)
+
+
+# %%
+def flat_accuracy(preds, labels):
+    pred_flat = np.argmax(preds, axis=1).flatten()
+    labels_flat = labels.flatten()
+    return np.sum(pred_flat == labels_flat) / len(labels_flat)
+
+
+def train_bert_one_epoch(bert_model: BertForMultipleChoice, dataloader, epoch):
+    console.log(f"Training epoch #{epoch+1}")
+    total_loss = 0
+    bert_model.train()
+
+    for step, batch in utils.tqdm(enumerate(dataloader), total=len(dataloader)):
+        batch_input_ids = batch[0].to(utils.DEVICE)
+        batch_input_masks = batch[1].to(utils.DEVICE)
+        batch_labels = batch[2].to(utils.DEVICE)
+
+        bert_model.zero_grad()
+        outputs = bert_model(
+            input_ids=batch_input_ids,
+            attention_mask=batch_input_masks,
+            labels=batch_labels
+        )
+        loss, logits = outputs[:2]
+        total_loss += loss.item()
+        loss.backward()
+        torch.nn.utils.clip_grad_norm_(bert_model.parameters(), 1.0)
+        optimizer.step()
+        scheduler.step()
+
+    avg_loss = total_loss / len(dataloader)
+    console.log("Average loss: {0:.4f}".format(avg_loss))
+
+
+def test_bert(bert_model: BertForMultipleChoice, dataloader):
+    console.log(f"Testing")
+    total_loss = 0
+    total_accuracy = 0
+    bert_model.eval()
+
+    for step, batch in utils.tqdm(enumerate(dataloader), total=len(dataloader)):
+        batch_input_ids = batch[0].to(utils.DEVICE)
+        batch_input_masks = batch[1].to(utils.DEVICE)
+        batch_labels = batch[2].to(utils.DEVICE)
+
+        with torch.no_grad():
+            outputs = bert_model(
+                input_ids=batch_input_ids,
+                attention_mask=batch_input_masks,
+                labels=batch_labels
+            )
+            loss, logits = outputs[:2]
+            total_loss += loss.item()
+
+        logits = logits.detach().cpu().numpy()
+        batch_labels = batch_labels.to('cpu').numpy()
+        total_accuracy += flat_accuracy(logits, batch_labels)
+
+    avg_loss = total_loss / len(dataloader)
+    console.log("Average loss: {0:.4f}".format(avg_loss))
+    avg_accuracy = total_accuracy / len(dataloader)
+    console.log("Accuracy: {0:.4f}".format(avg_accuracy))
+
+
+# %%
+for i in range(5):
+    train_bert_one_epoch(model, train_dataloader, i)
+    test_bert(model, validation_dataloader)
