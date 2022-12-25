@@ -26,7 +26,7 @@ def load_train(path):
 
 def apply_random_validation_split(train_dataset: torch.utils.data.TensorDataset, split=20):
     units = len(train_dataset)
-    validation_size = split * units / 100
+    validation_size = int(split * units / 100)
     train_size = units - validation_size
     assert(validation_size + train_size == units)
 
