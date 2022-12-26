@@ -12,10 +12,10 @@ from rich.console import Console
 console = Console()
 
 # %%
-BATCH_SIZE = 4
+BATCH_SIZE = 16
 EPOCHS = 5
 
-seed = 3407
+seed = 42
 random.seed(seed)
 np.random.seed(seed)
 torch.manual_seed(seed)
@@ -62,7 +62,7 @@ del(test_input_ids, test_attention_masks, test_targets)
 model = BertForMultipleChoice.from_pretrained('bert-base-uncased')
 model.to(utils.DEVICE)
 
-optimizer = AdamW(model.parameters(), lr=0.01, eps=1e-8)
+optimizer = AdamW(model.parameters(), lr=5e-5, eps=1e-8)
 scheduler = get_linear_schedule_with_warmup(
     optimizer,
     num_warmup_steps=0,
