@@ -62,7 +62,7 @@ del(test_input_ids, test_attention_masks, test_targets)
 model = BertForMultipleChoice.from_pretrained('bert-base-uncased')
 model.to(utils.DEVICE)
 
-optimizer = AdamW(model.parameters(), lr=2e-5, eps=1e-8)
+optimizer = AdamW(model.parameters(), lr=0.01, eps=1e-8)
 scheduler = get_linear_schedule_with_warmup(
     optimizer,
     num_warmup_steps=0,
@@ -109,6 +109,7 @@ def test_bert(bert_model: BertForMultipleChoice, dataloader):
     total_loss = 0
     total_accuracy = 0
     bert_model.eval()
+    softmax = torch.nn.Softmax(dim=1)
 
     for step, batch in utils.tqdm(enumerate(dataloader), total=len(dataloader)):
         batch_input_ids = batch[0].to(utils.DEVICE)
@@ -124,6 +125,7 @@ def test_bert(bert_model: BertForMultipleChoice, dataloader):
             loss, logits = outputs[:2]
             total_loss += loss.item()
 
+        logits = softmax(logits)
         logits = logits.detach().cpu().numpy()
         batch_labels = batch_labels.to('cpu').numpy()
         total_accuracy += flat_accuracy(logits, batch_labels)
