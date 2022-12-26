@@ -36,7 +36,7 @@ def apply_random_validation_split(train_dataset: torch.utils.data.TensorDataset,
 def tokenize(sentence_list, options_list, target_list):
     encode_plus_args = {
         "add_special_tokens": True,
-        "max_length": 50,
+        "max_length": 64,
         "padding": 'max_length',
         "return_attention_mask": True,
         "return_tensors": 'pt',
