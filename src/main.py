@@ -59,7 +59,7 @@ del(train_input_ids, train_attention_masks, train_targets)
 del(test_input_ids, test_attention_masks, test_targets)
 
 # %%
-model = BertForMultipleChoice.from_pretrained('bert-base-uncased')
+model = BertForMultipleChoice.from_pretrained('bert-large-uncased')
 model.to(utils.DEVICE)
 
 optimizer = AdamW(model.parameters(), lr=5e-5, eps=1e-8)
@@ -137,6 +137,7 @@ def test_bert(bert_model: BertForMultipleChoice, dataloader):
 
 
 # %%
-for i in range(5):
-    train_bert_one_epoch(model, train_dataloader, i)
-    test_bert(model, validation_dataloader)
+if __name__ == '__main__':
+    for i in range(5):
+        train_bert_one_epoch(model, train_dataloader, i)
+        test_bert(model, validation_dataloader)
