@@ -77,18 +77,18 @@ def flat_accuracy(preds, labels):
     return np.sum(pred_flat == labels_flat) / len(labels_flat)
 
 
-def train_bert_one_epoch(bert_model: BertForMultipleChoice, dataloader, epoch):
+def train_bert_one_epoch(dataloader, epoch):
     console.log(f"Training epoch #{epoch+1}")
     total_loss = 0
-    bert_model.train()
+    model.train()
 
     for step, batch in utils.tqdm(enumerate(dataloader), total=len(dataloader)):
         batch_input_ids = batch[0].to(utils.DEVICE)
         batch_input_masks = batch[1].to(utils.DEVICE)
         batch_labels = batch[2].to(utils.DEVICE)
 
-        bert_model.zero_grad()
-        outputs = bert_model(
+        model.zero_grad()
+        outputs = model(
             input_ids=batch_input_ids,
             attention_mask=batch_input_masks,
             labels=batch_labels
@@ -96,7 +96,7 @@ def train_bert_one_epoch(bert_model: BertForMultipleChoice, dataloader, epoch):
         loss, logits = outputs[:2]
         total_loss += loss.item()
         loss.backward()
-        torch.nn.utils.clip_grad_norm_(bert_model.parameters(), 1.0)
+        torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
         optimizer.step()
         scheduler.step()
 
@@ -104,11 +104,11 @@ def train_bert_one_epoch(bert_model: BertForMultipleChoice, dataloader, epoch):
     console.log("Average loss: {0:.4f}".format(avg_loss))
 
 
-def test_bert(bert_model: BertForMultipleChoice, dataloader):
+def test_bert(dataloader):
     console.log(f"Testing")
     total_loss = 0
     total_accuracy = 0
-    bert_model.eval()
+    model.eval()
     softmax = torch.nn.Softmax(dim=1)
 
     for step, batch in utils.tqdm(enumerate(dataloader), total=len(dataloader)):
@@ -117,7 +117,7 @@ def test_bert(bert_model: BertForMultipleChoice, dataloader):
         batch_labels = batch[2].to(utils.DEVICE)
 
         with torch.no_grad():
-            outputs = bert_model(
+            outputs = model(
                 input_ids=batch_input_ids,
                 attention_mask=batch_input_masks,
                 labels=batch_labels
@@ -139,5 +139,6 @@ def test_bert(bert_model: BertForMultipleChoice, dataloader):
 # %%
 if __name__ == '__main__':
     for i in range(5):
-        train_bert_one_epoch(model, train_dataloader, i)
-        test_bert(model, validation_dataloader)
+        train_bert_one_epoch(train_dataloader, i)
+        test_bert(validation_dataloader)
+        test_bert(test_dataloader)
