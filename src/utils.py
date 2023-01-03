@@ -39,8 +39,7 @@ def tokenize(sentence_list, options_list, target_list):
         "max_length": 64,
         "padding": 'max_length',
         "return_attention_mask": True,
-        "return_tensors": 'pt',
-        "truncation": True,
+        "return_tensors": 'pt'
     }
     input_ids_list = []
     attention_masks_list = []
@@ -51,30 +50,5 @@ def tokenize(sentence_list, options_list, target_list):
         input_ids_list.append(encoded_dict['input_ids'])
         attention_masks_list.append(encoded_dict['attention_mask'])
         return_target_list.append(int(target_label)-1)
-
-    return torch.stack(input_ids_list, dim=0), torch.stack(attention_masks_list, dim=0), torch.as_tensor(return_target_list)
-
-
-def tokenize_classification(sentence_list, options_list, target_list):
-    encode_plus_args = {
-        "add_special_tokens": True,
-        "max_length": 64,
-        "padding": 'max_length',
-        "return_attention_mask": True,
-        "return_tensors": 'pt',
-        "truncation": True,
-    }
-    input_ids_list = []
-    attention_masks_list = []
-    return_target_list = []
-    for (sentence, options, target_label) in tqdm(zip(sentence_list, options_list, target_list), total=len(sentence_list)):
-        sentences = [sentence.replace("_", option) for option in options]
-        encoded_dict = TOKENIZER(sentences, **encode_plus_args)
-        input_ids_list.extend(torch.unbind(encoded_dict['input_ids']))
-        attention_masks_list.extend(torch.unbind(encoded_dict['attention_mask']))
-        if target_label == '1':
-            return_target_list.extend([1, 0])
-        else:
-            return_target_list.extend([0, 1])
 
     return torch.stack(input_ids_list, dim=0), torch.stack(attention_masks_list, dim=0), torch.as_tensor(return_target_list)
