@@ -70,7 +70,7 @@ def tokenize_for_mlm(sentence_list, options_list, target_list):
         sentence = sentence.replace("_", "[MASK]")
         correct_sentence = sentence.replace("[MASK]", options[0] if target_label == '1' else options[1])
         encoded_sentence = TOKENIZER(sentence, **encode_plus_args)
-        encoded_correct_sentence = TOKENIZER(correct_sentence, add_special_tokens=False, return_attention_mask=False, return_token_type_ids=False)
+        encoded_correct_sentence = TOKENIZER(correct_sentence, add_special_tokens=True, return_attention_mask=False, return_token_type_ids=False)
         encoded_option1 = TOKENIZER(options[0], add_special_tokens=False, return_attention_mask=False, return_token_type_ids=False)
         encoded_option2 = TOKENIZER(options[1], add_special_tokens=False, return_attention_mask=False, return_token_type_ids=False)
         input_ids_list.append(encoded_sentence['input_ids'])
