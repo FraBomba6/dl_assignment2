@@ -1,6 +1,6 @@
 import torch
 from torch.utils.data import TensorDataset, DataLoader, RandomSampler
-from transformers import BertForMultipleChoice
+from transformers import BertForMultipleChoice, BertForMaskedLM
 from torch.optim import AdamW
 from transformers import get_linear_schedule_with_warmup
 import numpy as np
@@ -32,14 +32,14 @@ test_data = utils.load_train(test_file)
 
 # %%
 console.log("Tokenizing train data")
-train_input_ids, train_attention_masks, train_targets = utils.tokenize_for_multiple_choice(
+train_input_ids, train_attention_masks, train_targets = utils.tokenize_for_mlm(
     train_data["sentence"].to_list(),
     train_data[["option1", "option2"]].values.tolist(),
     train_data["answer"].to_list()
 )
 
 console.log("Tokenizing test data")
-test_input_ids, test_attention_masks, test_targets = utils.tokenize_for_multiple_choice(
+test_input_ids, test_attention_masks, test_targets = utils.tokenize_for_mlm(
     test_data["sentence"].to_list(),
     test_data[["option1", "option2"]].values.tolist(),
     test_data["answer"].to_list()
@@ -60,7 +60,8 @@ del(train_input_ids, train_attention_masks, train_targets)
 del(test_input_ids, test_attention_masks, test_targets)
 
 # %%
-model = BertForMultipleChoice.from_pretrained('bert-base-uncased')
+# model = BertForMultipleChoice.from_pretrained('bert-base-uncased')
+model = BertForMaskedLM.from_pretrained('bert-base-uncased')
 model.to(utils.DEVICE)
 
 optimizer = AdamW(model.parameters(), lr=5e-3, eps=1e-8)
