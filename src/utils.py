@@ -33,7 +33,7 @@ def apply_random_validation_split(train_dataset: torch.utils.data.TensorDataset,
     return torch.utils.data.random_split(train_dataset, [train_size, validation_size])
 
 
-def tokenize(sentence_list, options_list, target_list):
+def tokenize_for_multiple_choice(sentence_list, options_list, target_list):
     encode_plus_args = {
         "add_special_tokens": True,
         "max_length": 64,

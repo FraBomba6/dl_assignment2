@@ -32,14 +32,14 @@ test_data = utils.load_train(test_file)
 
 # %%
 console.log("Tokenizing train data")
-train_input_ids, train_attention_masks, train_targets = utils.tokenize(
+train_input_ids, train_attention_masks, train_targets = utils.tokenize_for_multiple_choice(
     train_data["sentence"].to_list(),
     train_data[["option1", "option2"]].values.tolist(),
     train_data["answer"].to_list()
 )
 
 console.log("Tokenizing test data")
-test_input_ids, test_attention_masks, test_targets = utils.tokenize(
+test_input_ids, test_attention_masks, test_targets = utils.tokenize_for_multiple_choice(
     test_data["sentence"].to_list(),
     test_data[["option1", "option2"]].values.tolist(),
     test_data["answer"].to_list()
