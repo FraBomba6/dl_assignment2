@@ -45,7 +45,8 @@ def tokenize(sentence_list, options_list, target_list):
     attention_masks_list = []
     return_target_list = []
     for (sentence, options, target_label) in tqdm(zip(sentence_list, options_list, target_list), total=len(sentence_list)):
-        sentences = [sentence.replace("_", option) for option in options]
+        split_sentence = sentence.split("_")
+        sentences = [(split_sentence[0], option + split_sentence[1]) for option in options]
         encoded_dict = TOKENIZER(sentences, **encode_plus_args)
         input_ids_list.append(encoded_dict['input_ids'])
         attention_masks_list.append(encoded_dict['attention_mask'])
