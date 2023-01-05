@@ -69,13 +69,14 @@ def tokenize_for_mlm(sentence_list, options_list, target_list):
     for (sentence, options, target_label) in tqdm(zip(sentence_list, options_list, target_list), total=len(sentence_list)):
         sentence = sentence.replace("_", "[MASK]")
         correct_sentence = sentence.replace("[MASK]", options[0] if target_label == '1' else options[1])
-        encoded_dict = TOKENIZER(sentence, **encode_plus_args)
+        encoded_sentence = TOKENIZER(sentence, **encode_plus_args)
+        encoded_correct_sentence = TOKENIZER(correct_sentence, add_special_tokens=False, return_attention_mask=False, return_token_type_ids=False)
         encoded_option1 = TOKENIZER(options[0], add_special_tokens=False, return_attention_mask=False, return_token_type_ids=False)
-        encoded_option2 = TOKENIZER(options[0], add_special_tokens=False, return_attention_mask=False, return_token_type_ids=False)
-        input_ids_list.append(encoded_dict['input_ids'])
-        attention_masks_list.append(encoded_dict['attention_mask'])
+        encoded_option2 = TOKENIZER(options[1], add_special_tokens=False, return_attention_mask=False, return_token_type_ids=False)
+        input_ids_list.append(encoded_sentence['input_ids'])
+        attention_masks_list.append(encoded_sentence['attention_mask'])
         return_target_list.append(int(target_label) - 1)
-        labels_list.append()
+        labels_list.append(encoded_correct_sentence['input_ids'])
+        options_list.append([encoded_option1['input_ids'], encoded_option2['input_ids']])
 
-    return torch.stack(input_ids_list, dim=0), torch.stack(attention_masks_list, dim=0), torch.as_tensor(
-        return_target_list)
+    return torch.stack(input_ids_list, dim=0), torch.stack(attention_masks_list, dim=0), torch.as_tensor(labels_list), return_target_list, options_list
