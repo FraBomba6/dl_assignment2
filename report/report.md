@@ -62,7 +62,6 @@ The three structures obtained would, then, be:
 | 2        | `[CLS] Emily looked up and saw Patricia racing by overhead, as [SEP] Emily was under the ramp [SEP]`, `[CLS] Emily looked up and saw Patricia racing by overhead, as [SEP] Patricia was under the ramp [SEP]` |
 | 3        |  `[CLS] Emily looked up and saw Patricia racing by overhead, as _ was under the ramp [SEP] Emiliy [SEP]`, `[CLS] Emily looked up and saw Patricia racing by overhead, as _ was under the ramp [SEP] Patricia [SEP]` |
 
-
 Moreover, sentences were tokenized using a **BertTokenizer** with a **max length** of 64 (chosen in order to allow each sentence not to be truncated) and **padding to max length** applied. The list of input ids, the list of attention masks and the return targets one were, finally, stacked in order to allow batch processing by the model.
 
 ### Results
@@ -70,3 +69,5 @@ Moreover, sentences were tokenized using a **BertTokenizer** with a **max length
 ## BertForMaskedLM
 
 # Conclusions
+
+
