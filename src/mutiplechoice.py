@@ -26,8 +26,8 @@ console.log("Loading data")
 train_file = os.path.join(utils.PROJECT_ROOT, "data", "train.jsonl")
 test_file = os.path.join(utils.PROJECT_ROOT, "data", "test.jsonl")
 
-train_data = utils.load_train(train_file)
-test_data = utils.load_train(test_file)
+train_data = utils.load_data(train_file)
+test_data = utils.load_data(test_file)
 
 # %%
 console.log("Tokenizing train data")

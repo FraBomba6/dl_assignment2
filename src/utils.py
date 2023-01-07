@@ -16,7 +16,7 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.ba
 TOKENIZER = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
 
 
-def load_train(path):
+def load_data(path):
     if not os.path.exists(path):
         raise FileNotFoundError(f"Unable to find {path}")
     with open(path, "r") as f:
