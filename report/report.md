@@ -3,6 +3,8 @@ title: "Deep Learning Assignment"
 author: [Francesco Bombassei De Bona, Andrea Cantarutti]
 date: "2022-01-08"
 keywords: [NLP, DeepLearning]
+header-includes:
+  - \usepackage{graphicx}
 ---
 
 # Introduction
@@ -66,7 +68,59 @@ Moreover, sentences were tokenized using a **BertTokenizer** with a **max length
 
 ### Results
 
+The training module was implemented in `src/multiplechoice.py`. The training properties employed were defined as follows:
+
+| Property      | Value  |
+|---------------|--------|
+| Epochs        | 2      |
+| Batch Size    | 32     |
+| Optimizer     | AdamW  |
+| Learning Rate | 5e-3   |
+| Scheduler     | linear |
+
+Regardless of the strategy used for the input structuring, a slight and therefore not significant decrease in the loss function's output was observed, together with no improvement in terms of **prediction accuracy**. Moreover, it was determined that the model **converges** after the training. In fact, the latter causes all the predictions to be the same in terms of option index. This behaviour still remains unclear and causes BertForMultipleChoice not to be a suitable option for the given task.
+
+The following screenshot shows the output of the evaluation on the training, validation and testing dataset **before the two epochs training**:
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=400px]{img/MultipleChoice_before.png}
+\end{figure}
+
+The following screenshot shows, instead, the output of the evaluation on the training, validation and testing dataset **after the training of each epoch**:
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=400px]{img/MultipleChoice_after.png}
+\end{figure}
+
 ## BertForMaskedLM
+
+The second solution attempted involved the usage of the **BertForMaskedLM** model. The latter is built on top of **BERT** and allows to finetune it on the prediction of words which were intentionally hidden from a sentence by looking at its context.
+
+Again, a custom tokenize function (named `tokenize_for_mlm(sentence_list, options_list, target_list)`) was defined in the `utils.py` module, in order to tokenize and structure the input as a Masked Language Modelling task.
+
+On these basis, the `_` character (which represents the missing word in the dataset) was replaced with the apposite `[MASK]` token and, then, both the correct and the masked sentence were tokenized using a **BertTokenizer** with, again, **max length** of 64 and **padding to max length** applied. The correct sentence was used in order to produce a target label list, while the masked one was used as input for the model. 
+
+The two candidates were also tokenized with **max length** of 6 and **padding to max length** applied (in this case, no special tokens were added by the tokenizer). This was done in order to ensure the presence of the missing words in the model's vocabulary.
+
+The list of input ids, the list of attentions masks, the target labels list and the option tokens list (together with the correct option index) were, then, all stacked to allow batch processing by the model.
+
+### Results
+
+The training module was implemented in `src/maskedlm.py`. The training properties employed were defined as follows:
+
+| Property      | Value  |
+|---------------|--------|
+| Epochs        | 2      |
+| Batch Size    | 32     |
+| Optimizer     | AdamW  |
+| Learning Rate | 5e-3   |
+| Scheduler     | linear |
+
+Even in this case, a non significant decrease in the loss function's output and no improvement in terms of accuracy were observed. After the training phase, the same kind of convergence found in the previous model caused, again, all the predictions to drift to the same index.
+
+A subsequent attempt involved the complete substitution of the option candidates with atomic tokens (for example, _a_ instead of _Emily_ and _b_ instead of _Patricia_) in order to avoid the presence of multiple tokens corresponding to a single word, but no improvements were observed.
 
 # Conclusions
 
