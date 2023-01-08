@@ -58,11 +58,11 @@ Given the following case:
 
 The three structures obtained would, then, be:
 
-| Strategy | Output                                                                                                                        |
-|----------|-------------------------------------------------------------------------------------------------------------------------------|
-| 1        | `[CLS] Emily looked up and saw Patricia racing by overhead, as Emiliy was under the ramp . [SEP]`, `[CLS] Emily looked up and saw Patricia racing by overhead, as Patricia was under the ramp . [SEP]` |
-| 2        | `[CLS] Emily looked up and saw Patricia racing by overhead, as [SEP] Emily was under the ramp [SEP]`, `[CLS] Emily looked up and saw Patricia racing by overhead, as [SEP] Patricia was under the ramp [SEP]` |
-| 3        |  `[CLS] Emily looked up and saw Patricia racing by overhead, as _ was under the ramp [SEP] Emiliy [SEP]`, `[CLS] Emily looked up and saw Patricia racing by overhead, as _ was under the ramp [SEP] Patricia [SEP]` |
+| Strategy | Output                                                                                                                                                                                                             |
+|----------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 1        | `[CLS] Emily looked up and saw Patricia racing by overhead, as Emiliy was under the ramp . [SEP]`, `[CLS] Emily looked up and saw Patricia racing by overhead, as Patricia was under the ramp . [SEP]`             |
+| 2        | `[CLS] Emily looked up and saw Patricia racing by overhead, as [SEP] Emily was under the ramp [SEP]`, `[CLS] Emily looked up and saw Patricia racing by overhead, as [SEP] Patricia was under the ramp [SEP]`      |
+| 3        | `[CLS] Emily looked up and saw Patricia racing by overhead, as _ was under the ramp [SEP] Emiliy [SEP]`, `[CLS] Emily looked up and saw Patricia racing by overhead, as _ was under the ramp [SEP] Patricia [SEP]` |
 
 Moreover, sentences were tokenized using a **BertTokenizer** with a **max length** of 64 (chosen in order to allow each sentence not to be truncated) and **padding to max length** applied. The list of input ids, the list of attention masks and the return targets one were, finally, stacked in order to allow batch processing by the model.
 
@@ -118,7 +118,7 @@ The training module was implemented in `src/maskedlm.py`. The training propertie
 | Learning Rate | 5e-3   |
 | Scheduler     | linear |
 
-Even in this case, a non significant decrease in the loss function's output and no improvement in terms of accuracy were observed. After the training phase, the same kind of convergence found in the previous model caused, again, all the predictions to drift to the same index.
+Even in this case, a non-significant decrease in the loss function's output and no improvement in terms of accuracy were observed. After the training phase, the same kind of convergence found in the previous model caused, again, all the predictions to drift to the same index.
 
 A subsequent attempt involved the complete substitution of the option candidates with atomic tokens (for example, _a_ instead of _Emily_ and _b_ instead of _Patricia_) in order to avoid the presence of multiple tokens corresponding to a single word, but no improvements were observed.
 
