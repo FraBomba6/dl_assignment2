@@ -59,7 +59,7 @@ Given the following case:
 The three structures obtained would, then, be:
 
 | Strategy | Output                                                                                                                                                                                                             |
-|----------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | 1        | `[CLS] Emily looked up and saw Patricia racing by overhead, as Emiliy was under the ramp . [SEP]`, `[CLS] Emily looked up and saw Patricia racing by overhead, as Patricia was under the ramp . [SEP]`             |
 | 2        | `[CLS] Emily looked up and saw Patricia racing by overhead, as [SEP] Emily was under the ramp [SEP]`, `[CLS] Emily looked up and saw Patricia racing by overhead, as [SEP] Patricia was under the ramp [SEP]`      |
 | 3        | `[CLS] Emily looked up and saw Patricia racing by overhead, as _ was under the ramp [SEP] Emiliy [SEP]`, `[CLS] Emily looked up and saw Patricia racing by overhead, as _ was under the ramp [SEP] Patricia [SEP]` |
@@ -71,7 +71,7 @@ Moreover, sentences were tokenized using a **BertTokenizer** with a **max length
 The training module was implemented in `src/multiplechoice.py`. The training properties employed were defined as follows:
 
 | Property      | Value  |
-|---------------|--------|
+| ------------- | ------ |
 | Epochs        | 2      |
 | Batch Size    | 32     |
 | Optimizer     | AdamW  |
@@ -82,17 +82,24 @@ Regardless of the strategy used for the input structuring, a slight and therefor
 
 The following screenshot shows the output of the evaluation on the training, validation and testing dataset **before the two epochs training**:
 
+|
+|
+
 \begin{figure}[H]
 \centering
 \includegraphics[width=400px]{img/MultipleChoice_before.png}
 \end{figure}
 
+\newpage
+
 The following screenshot shows, instead, the output of the evaluation on the training, validation and testing dataset **after the training of each epoch**:
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=400px]{img/MultipleChoice_after.png}
+\includegraphics[width=340px]{img/MultipleChoice_after.png}
 \end{figure}
+
+\newpage
 
 ## BertForMaskedLM
 
@@ -110,18 +117,44 @@ The list of input ids, the list of attentions masks, the target labels list and 
 
 The training module was implemented in `src/maskedlm.py`. The training properties employed were defined as follows:
 
-| Property      | Value  |
-|---------------|--------|
-| Epochs        | 2      |
-| Batch Size    | 32     |
-| Optimizer     | AdamW  |
-| Learning Rate | 5e-3   |
-| Scheduler     | linear |
+| Property      | Values           |
+| ------------- | ---------------- |
+| Epochs        | 2                |
+| Batch Size    | 16, 32, 64       |
+| Optimizer     | AdamW            |
+| Learning Rate | 5e-3, 5e-4, 5e-5 |
+| Scheduler     | linear           |
 
-Even in this case, a non-significant decrease in the loss function's output and no improvement in terms of accuracy were observed. After the training phase, the same kind of convergence found in the previous model caused, again, all the predictions to drift to the same index.
+Even in this case, a non-significant decrease in the loss function's output and no improvement in terms of accuracy were observed, even by changing hyperparameters such as **batch size** and **learning rate**. After the training phase, the same kind of convergence found in the previous model caused, again, all the predictions to drift to the same index.
 
 A subsequent attempt involved the complete substitution of the option candidates with atomic tokens (for example, _a_ instead of _Emily_ and _b_ instead of _Patricia_) in order to avoid the presence of multiple tokens corresponding to a single word, but no improvements were observed.
 
+The following screenshot shows the output of the evaluation on the training, validation and testing dataset **before the two epochs training**:
+
+|
+|
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=400px]{img/Masked_before.png}
+\end{figure}
+
+\newpage
+
+The following screenshot shows, instead, the output of the evaluation on the training, validation and testing dataset **after the training of each epoch**:
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=280px]{img/Masked_after.png}
+\end{figure}
+
+\newpage
+
+## XLNetForMultipleChoice
+
+Other attempts involved the usage of the **XLNetForMultipleChoice** transformer model, which, in some cases, provides a few improvements compared to BERT. Even in this case, though, the same performances of the previously attemptes models were observed.
+
 # Conclusions
+
 
 
