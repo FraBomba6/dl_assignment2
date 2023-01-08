@@ -1,6 +1,8 @@
 ---
-title: "Deep Learning Assignment"
-author: [Francesco Bombassei De Bona, Andrea Cantarutti]
+title: "Deep Learning Assignment - Cloze Tasks"
+author: | 
+        | Francesco Bombassei De Bona (144665)
+        | Andrea Cantarutti (141808)
 date: "2022-01-08"
 keywords: [NLP, DeepLearning]
 header-includes:
@@ -9,24 +11,21 @@ header-includes:
 
 # Introduction
 
-The following report describes the strategies adopted and the results obtained with the aim of defining a Natural Language Processing model. The latter was specifically trained to solve cloze tests with a limited set of available candidates. 
+The following report describes the strategies adopted and the results obtained with the aim of defining a Natural Language Processing model. The latter was specifically trained to solve cloze tests with a limited set of available candidate options. 
 
 # Project Structure
 
 The root folder of the project repository contains the following files:
 
 - `requirements.txt`, which lists the libraries that need to be installed
-- `assignment_2.pdf`, which is the original assignment document
-- `README.md`, which contains a brief description of the project
-- `config.sh`, which allows to rapidly configure any debian machine for training
 - `data/`
   + `train.jsonl`, which contains the train dataset
   + `test.jsonl`, which contains the test dataset
 - `src/`
-  + `utils.py`, which referes to a module with all the utility functions that were implemented
+  + `utils.py`, which refers to a module with all the utility functions that were implemented
   + `maskedlm.py`, which refers to the BertForMaskedLM implementation strategy
-  + `multiplechoice.py`, which referes to the BertForMultipleChoice implementation strategy
-- `report/`, which contains all the files needed to generate the current report
+  + `multiplechoice.py`, which refers to the BertForMultipleChoice implementation strategy
+- `report.pdf`, which refers to the following report
 
 # Task Description 
 
@@ -58,11 +57,11 @@ Given the following case:
 
 The three structures obtained would, then, be:
 
-| Strategy | Output                                                                                                                                                                                                             |
-| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Strategy | Output |
+| -------- | --------------------------------------------------------------------------------------------------------- |
 | 1        | `[CLS] Emily looked up and saw Patricia racing by overhead, as Emiliy was under the ramp . [SEP]`, `[CLS] Emily looked up and saw Patricia racing by overhead, as Patricia was under the ramp . [SEP]`             |
-| 2        | `[CLS] Emily looked up and saw Patricia racing by overhead, as [SEP] Emily was under the ramp [SEP]`, `[CLS] Emily looked up and saw Patricia racing by overhead, as [SEP] Patricia was under the ramp [SEP]`      |
-| 3        | `[CLS] Emily looked up and saw Patricia racing by overhead, as _ was under the ramp [SEP] Emiliy [SEP]`, `[CLS] Emily looked up and saw Patricia racing by overhead, as _ was under the ramp [SEP] Patricia [SEP]` |
+| 2        | `[CLS] Emily looked up and saw Patricia racing by overhead, as [SEP] Emily was under the ramp . [SEP]`, `[CLS] Emily looked up and saw Patricia racing by overhead, as [SEP] Patricia was under the ramp . [SEP]`      |
+| 3        | `[CLS] Emily looked up and saw Patricia racing by overhead, as _ was under the ramp . [SEP] Emiliy [SEP]`, `[CLS] Emily looked up and saw Patricia racing by overhead, as _ was under the ramp . [SEP] Patricia [SEP]` |
 
 Moreover, sentences were tokenized using a **BertTokenizer** with a **max length** of 64 (chosen in order to allow each sentence not to be truncated) and **padding to max length** applied. The list of input ids, the list of attention masks and the return targets one were, finally, stacked in order to allow batch processing by the model.
 
@@ -70,15 +69,17 @@ Moreover, sentences were tokenized using a **BertTokenizer** with a **max length
 
 The training module was implemented in `src/multiplechoice.py`. The training properties employed were defined as follows:
 
-| Property      | Value  |
-| ------------- | ------ |
-| Epochs        | 2      |
-| Batch Size    | 32     |
-| Optimizer     | AdamW  |
-| Learning Rate | 5e-3   |
-| Scheduler     | linear |
+| Property      | Values           |
+| ------------- | ---------------- |
+| Epochs        | 2                |
+| Batch Size    | 16, 32, 64       |
+| Optimizer     | AdamW            |
+| Learning Rate | 5e-3, 5e-4, 5e-5 |
+| Scheduler     | linear           |
 
 Regardless of the strategy used for the input structuring, a slight and therefore not significant decrease in the loss function's output was observed, together with no improvement in terms of **prediction accuracy**. Moreover, it was determined that the model **converges** after the training. In fact, the latter causes all the predictions to be the same in terms of option index. This behaviour still remains unclear and causes BertForMultipleChoice not to be a suitable option for the given task.
+
+\newpage
 
 The following screenshot shows the output of the evaluation on the training, validation and testing dataset **before the two epochs training**:
 
@@ -152,9 +153,11 @@ The following screenshot shows, instead, the output of the evaluation on the tra
 
 ## XLNetForMultipleChoice
 
-Other attempts involved the usage of the **XLNetForMultipleChoice** transformer model, which, in some cases, provides a few improvements compared to BERT. Even in this case, though, the same performances of the previously attemptes models were observed.
+Other attempts involved the usage of the **XLNetForMultipleChoice** transformer model, which, in some cases, provides a few improvements compared to BERT. Even in this case, though, the same performances of the previously attempted models were observed.
 
 # Conclusions
+
+Multiple models have been tested, but none of them could be determined to be sufficient in order to solve the task assigned. As outlined previously, no one has shown any significant improvement compared to the others. Moreover, the _drift_ observed in each model after the training phase causes a negative impact on the model, making it unusable for predictions. Despite the efforts, no sensible reason could be determined in order to prevent the latter effect to happen during training.
 
 
 

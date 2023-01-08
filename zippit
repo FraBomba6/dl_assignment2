@@ -1,0 +1,20 @@
+#!/bin/bash
+#
+FOLDER_NAME="144665_141808"
+ZIP_NAME="144665_141808.zip"
+
+mkdir -p $FOLDER_NAME
+
+cp -r ./src "$FOLDER_NAME/src"
+rm -rf "$FOLDER_NAME/src/__pycache__"
+
+cp -r ./data "$FOLDER_NAME/data"
+cp ./requirements.txt "$FOLDER_NAME/requirements.txt"
+make -C ./report
+cp ./report/report.pdf "$FOLDER_NAME/report.pdf"
+
+zip -r $ZIP_NAME $FOLDER_NAME
+
+rm -rf $FOLDER_NAME
+
+echo "Zipped succesfully :D"
